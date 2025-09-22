@@ -1,0 +1,77 @@
+### Constants
+@host = localhost
+@port = 8111
+@user = admin
+@password = admin
+
+### GET all projects
+GET http://{{user}}:{{password}}@{{host}}:{{port}}/app/rest/projects
+Content-Type: application/json
+Accept: application/json
+
+### Step 1: Create project
+# @no-cookie-jar
+POST http://{{user}}:{{password}}@{{host}}:{{port}}/app/rest/projects
+Content-Type: application/json
+Accept: application/json
+
+{
+  "parentProject": {
+    "locator": "_Root"
+  },
+  "name": "Project123",
+  "id": "project123",
+  "copyAllAssociatedSettings": true
+}
+
+### Step 2: Create build type
+# @no-cookie-jar
+POST http://{{user}}:{{password}}@{{host}}:{{port}}/app/rest/buildTypes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "id123",
+  "name": "Hello World",
+  "project": {
+    "id": "project123"
+  },
+  "parameters": {
+    "property": [
+      {
+        "name": "myBuildParameter",
+        "value": "myValue"
+      }
+    ]
+  },
+  "steps": {
+    "step": [
+      {
+        "name": "myCommandLineStep",
+        "type": "simpleRunner",
+        "properties": {
+          "property": [
+            {
+              "name": "script.content",
+              "value": "echo 'Hello World!'"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+
+### Step 3: Run build
+# @no-cookie-jar
+POST http://{{user}}:{{password}}@{{host}}:{{port}}/app/rest/buildQueue
+Content-Type: application/json
+Accept: application/json
+
+{
+  "buildType": {
+    "id": "id123"
+  }
+}
+
+
