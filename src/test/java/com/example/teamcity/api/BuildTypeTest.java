@@ -47,6 +47,7 @@ public class BuildTypeTest extends BaseApiTest {
 
             softy.assertEquals(buildType.getName(), createdBuildType.getName(), "Build type name is not correct");
         });
+        ;
     }
 
     @Test(description = "User should not be able to create two build types with the same id", groups = {"Negative", "CRUD"})
