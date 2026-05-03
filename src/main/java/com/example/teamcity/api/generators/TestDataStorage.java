@@ -54,6 +54,9 @@ public class TestDataStorage {
     }
 
     public void addCreatedEntity(Endpoint endpoint, BaseModel model) {
+        if (endpoint.isMocked()) {
+            return;
+        }
         addCreatedEntity(endpoint, getEntityIdOrLocator(model));
     }
 

@@ -90,7 +90,7 @@ public final class TestDataGenerator {
 
     public  static TestData generate(){
         try{
-            var testData = TestData.class.getDeclaredConstructor().newInstance(0);
+            var testData = TestData.class.getDeclaredConstructor().newInstance();
             var generatedModels = new ArrayList<BaseModel>();
             for (var field : testData.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
