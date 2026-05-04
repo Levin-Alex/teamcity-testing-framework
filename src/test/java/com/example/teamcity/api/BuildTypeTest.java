@@ -58,6 +58,7 @@ public class BuildTypeTest extends BaseApiTest {
     @Test(description = "Project admin should be able to create build type for their project", groups = {"Positive", "Roles"})
     public void projectAdminCreatesBuildTypeTest() {
         superUserCheckRequests.<Project>getRequest(PROJECT).create(testData.getProject());
+        
         testData.getUser().setRoles(Roles.builder()
                 .role(List.of(Role.builder()
                         .roleId(UserRole.PROJECT_ADMIN.getRoleId())
@@ -65,15 +66,18 @@ public class BuildTypeTest extends BaseApiTest {
                         .build()))
                 .build());
         superUserCheckRequests.getRequest(USERS).create(testData.getUser());
+        
         var userCheckedRequests = new CheckedRequests(Specifications.authSpec(testData.getUser()));
         userCheckedRequests.getRequest(BUILD_TYPES).create(testData.getBuildType());
         var createdBuildType = userCheckedRequests.<BuildType>getRequest(BUILD_TYPES).read(testData.getBuildType().getId());
+        
         softy.assertEquals(createdBuildType.getName(), testData.getBuildType().getName(), "Build type name is not correct");
     }
 
     @Test(description = "Project admin should not be able to create build type for not their project", groups = {"Negative", "Roles"})
     public void projectAdminCreatesBuildTypeForAnotherUserProjectTest() {
         superUserCheckRequests.<Project>getRequest(PROJECT).create(testData.getProject());
+        
         testData.getUser().setRoles(Roles.builder()
                 .role(List.of(Role.builder()
                         .roleId(UserRole.PROJECT_ADMIN.getRoleId())
@@ -92,6 +96,7 @@ public class BuildTypeTest extends BaseApiTest {
                 .build());
         superUserCheckRequests.<Project>getRequest(PROJECT).create(secondProject);
         superUserCheckRequests.getRequest(USERS).create(secondUser);
+        
         var buildTypeOfProject1 = testData.getBuildType();
         new UncheckedBase(Specifications.authSpec(secondUser), BUILD_TYPES).create(buildTypeOfProject1)
                 .then().assertThat()
