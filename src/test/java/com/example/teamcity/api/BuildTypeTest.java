@@ -31,7 +31,7 @@ public class BuildTypeTest extends BaseApiTest {
         userCheckedRequests.getRequest(BUILD_TYPES).create(testData.getBuildType());
         var createdBuildType = userCheckedRequests.<BuildType>getRequest(BUILD_TYPES).read(testData.getBuildType().getId());
 
-        softy.assertEquals(testData.getBuildType().getName(), createdBuildType.getName(), "Build type name is not correct");
+        assertCreatedBuildTypeName(testData.getBuildType(), createdBuildType);
     }
 
     @Test(description = "User should not be able to create two build types with the same id", groups = {"Negative", "CRUD"})
@@ -64,7 +64,7 @@ public class BuildTypeTest extends BaseApiTest {
         userCheckedRequests.getRequest(BUILD_TYPES).create(testData.getBuildType());
         var createdBuildType = userCheckedRequests.<BuildType>getRequest(BUILD_TYPES).read(testData.getBuildType().getId());
         
-        softy.assertEquals(createdBuildType.getName(), testData.getBuildType().getName(), "Build type name is not correct");
+        assertCreatedBuildTypeName(testData.getBuildType(), createdBuildType);
     }
 
     @Test(description = "Project admin should not be able to create build type for not their project", groups = {"Negative", "Roles"})
@@ -93,5 +93,9 @@ public class BuildTypeTest extends BaseApiTest {
         var buildTypeOfProject1 = testData.getBuildType();
         new UncheckedBase(Specifications.authSpec(secondUser), BUILD_TYPES).create(buildTypeOfProject1)
                 .then().spec(ValidationResponseSpecifications.checkForbiddenToEditProject(testData.getProject().getId()));
+    }
+
+    private void assertCreatedBuildTypeName(BuildType expected, BuildType created) {
+        softy.assertEquals(created.getName(), expected.getName(), "Build type name is not correct");
     }
 }
