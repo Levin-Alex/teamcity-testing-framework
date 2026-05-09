@@ -1,28 +1,22 @@
 package com.example.teamcity.api;
 
-import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.models.BuildType;
 import com.example.teamcity.api.models.Project;
 import com.example.teamcity.api.models.Role;
 import com.example.teamcity.api.models.Roles;
 import com.example.teamcity.api.models.User;
 import com.example.teamcity.api.requests.CheckedRequests;
-import com.example.teamcity.api.requests.checked.CheckedBase;
 import com.example.teamcity.api.requests.unchecked.UncheckedBase;
 import com.example.teamcity.api.spec.Specifications;
-
-import org.apache.http.HttpStatus;
-import org.hamcrest.Matchers;
+import com.example.teamcity.api.spec.ValidationResponseSpecifications;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import com.example.teamcity.api.enums.UserRole;
 
 import static com.example.teamcity.api.enums.Endpoint.*;
 import static com.example.teamcity.api.generators.TestDataGenerator.generate;
-import static io.qameta.allure.Allure.step;
 
 @Test(groups = {"Regression"})
 public class BuildTypeTest extends BaseApiTest {
@@ -51,8 +45,7 @@ public class BuildTypeTest extends BaseApiTest {
 
         userCheckedRequests.getRequest(BUILD_TYPES).create(testData.getBuildType());
         new UncheckedBase(Specifications.authSpec(testData.getUser()), BUILD_TYPES).create(buildTypeWithSameId)
-                .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
-                .body("errors[0].message", Matchers.containsString("The build configuration / template ID \"%s\" is already used by another configuration or template".formatted(testData.getBuildType().getId())));
+                .then().spec(ValidationResponseSpecifications.checkBuildTypeIdAlreadyUsed(testData.getBuildType().getId()));
     }
 
     @Test(description = "Project admin should be able to create build type for their project", groups = {"Positive", "Roles"})
@@ -99,9 +92,6 @@ public class BuildTypeTest extends BaseApiTest {
         
         var buildTypeOfProject1 = testData.getBuildType();
         new UncheckedBase(Specifications.authSpec(secondUser), BUILD_TYPES).create(buildTypeOfProject1)
-                .then().assertThat()
-                .statusCode(HttpStatus.SC_FORBIDDEN)
-                .body(Matchers.containsString(
-                        "You do not have enough permissions to edit project with id: " + testData.getProject().getId()));
+                .then().spec(ValidationResponseSpecifications.checkForbiddenToEditProject(testData.getProject().getId()));
     }
 }
